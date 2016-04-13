@@ -140,7 +140,7 @@ public class AVPlayer {
 		
 		try{
 //		for(int i = 0; i!= bufferedImgs.length; i++){
-			if(current == bufferedImgs.length){
+			if(current > bufferedImgs.length){
 				return;
 			}
 			System.gc();
