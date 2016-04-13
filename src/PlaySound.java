@@ -32,6 +32,14 @@ public class PlaySound {
 	this.waveStream = new BufferedInputStream(waveStream);
     }
 
+    //Peter
+    
+    SourceDataLine dataLine = null;
+    
+    //Peter
+    
+    
+    
 	public void play() throws PlayWaveException {
 
 	AudioInputStream audioInputStream = null;
@@ -48,7 +56,7 @@ public class PlaySound {
 	Info info = new Info(SourceDataLine.class, audioFormat);
 
 	// opens the audio channel
-	SourceDataLine dataLine = null;
+	//SourceDataLine dataLine = null; //Peter Delete
 	try {
 	    dataLine = (SourceDataLine) AudioSystem.getLine(info);
 	    dataLine.open(audioFormat, this.EXTERNAL_BUFFER_SIZE);
@@ -79,4 +87,17 @@ public class PlaySound {
 	}
 
     }
+	
+	//peter
+		public void Stop(){
+			dataLine.stop();
+		}
+		
+		public void Restart(){
+			dataLine.start();
+		}
+		//peter
+	
+	
+	
 }
