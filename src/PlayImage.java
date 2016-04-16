@@ -198,6 +198,9 @@ public class PlayImage {
 
 	public BufferedImage getCurrentImg() {
 		synchronized (currentLock) {
+			if(current >= bufferedImgs.length){
+				return null;
+			}
 			synchronized (locks[current]) {
 				if (last == current) {
 					return null;
