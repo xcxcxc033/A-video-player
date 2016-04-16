@@ -37,7 +37,6 @@ public class AVPlayer {
 			File file = new File(args[0]);
 			
 			is = new FileInputStream(file);
-			
 
 			//long len = file.length();
 			long len = width*height*3;
@@ -72,15 +71,23 @@ public class AVPlayer {
 				}
 			}
 			// Use labels to display the images
+			
+			
 			frame = new JFrame();
 			GridBagLayout gLayout = new GridBagLayout();
 			frame.getContentPane().setLayout(gLayout);
+			
+			
 
 			JLabel lbText1 = new JLabel("Video: " + args[0]);
 			lbText1.setHorizontalAlignment(SwingConstants.LEFT);
 			JLabel lbText2 = new JLabel("Audio: " + args[1]);
 			lbText2.setHorizontalAlignment(SwingConstants.LEFT);
 			lbIm1 = new JLabel(new ImageIcon(img));
+			JLabel button_start = new JLabel();
+			JLabel last = new JLabel("last");
+//			JLabel button_stop = new JLabel("btn_stop");
+
 
 			GridBagConstraints c = new GridBagConstraints();
 			c.fill = GridBagConstraints.HORIZONTAL;
@@ -101,9 +108,27 @@ public class AVPlayer {
 			c.gridx = 0;
 			c.gridy = 2;
 			frame.getContentPane().add(lbIm1, c);
+			
+			/** button
+			*/
+
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.weightx = 1;
+			c.gridx = 0;
+			c.gridy = 3;
+			frame.getContentPane().add(button_start, c);
+			
+			
 
 			frame.pack();
 			frame.setVisible(true);
+			
+			frame.setSize(500, 450);
+			
+			ButtonLayOut btn = new ButtonLayOut();
+			btn.initButton_start(button_start);
+//			btn.initButton_pause(button_pause);
+//			btn.initButton_stop(button_stop);
 			
 //			java.util.List<BufferedImage> frames = allFrames(args[0]);
 //				for(int i = 0; i!= frames.size(); i++){
@@ -117,18 +142,6 @@ public class AVPlayer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
-
-		
-			
-			
-			
-
-
-
-		
-		
-		
-		
 	}
 	
 	public void updateFrame(){
@@ -150,6 +163,7 @@ public class AVPlayer {
 //				System.out.println(img);
 			}
 			lbIm1.setIcon(new ImageIcon(img));
+			
 //			System.out.println(i);
 			Thread.sleep(intervalTime);
 		}}
@@ -265,13 +279,13 @@ public class AVPlayer {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		if (args.length < 2) {
 		    System.err.println("usage: java -jar AVPlayer.jar [RGB file] [WAV file]");
 		    return;
 		}
 		
-		AVPlayer ren = new AVPlayer();
+		final AVPlayer ren = new AVPlayer();
 		ren.initialize(args);
 		Thread imgs = new Thread() {
 			public void run(){
