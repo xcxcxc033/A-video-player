@@ -1,9 +1,12 @@
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.*;
 import java.io.*;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,7 +28,12 @@ public class AVPlayer {
     private int loadedFrame = -1;
     private Object currentLock = new Object();
     private final int intervalTime = 66;//66;
-	
+    
+    //peter 
+    JButton btnReplay;
+    JButton btnStart;
+    JButton btnStop;
+    //peter
 
 	public void initialize(String[] args){
 		int width = 480;
@@ -37,7 +45,6 @@ public class AVPlayer {
 			File file = new File(args[0]);
 			
 			is = new FileInputStream(file);
-			
 
 			//long len = file.length();
 			long len = width*height*3;
@@ -72,15 +79,23 @@ public class AVPlayer {
 				}
 			}
 			// Use labels to display the images
+			
+			
 			frame = new JFrame();
 			GridBagLayout gLayout = new GridBagLayout();
 			frame.getContentPane().setLayout(gLayout);
+			
+			
 
 			JLabel lbText1 = new JLabel("Video: " + args[0]);
 			lbText1.setHorizontalAlignment(SwingConstants.LEFT);
 			JLabel lbText2 = new JLabel("Audio: " + args[1]);
 			lbText2.setHorizontalAlignment(SwingConstants.LEFT);
 			lbIm1 = new JLabel(new ImageIcon(img));
+			JLabel btnMainLabel = new JLabel();
+			JLabel last = new JLabel("last");
+//			JLabel button_stop = new JLabel("btn_stop");
+
 
 			GridBagConstraints c = new GridBagConstraints();
 			c.fill = GridBagConstraints.HORIZONTAL;
@@ -101,9 +116,45 @@ public class AVPlayer {
 			c.gridx = 0;
 			c.gridy = 2;
 			frame.getContentPane().add(lbIm1, c);
+			
+			/** button
+			*/
+
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.weightx = 1;
+			c.gridx = 0;
+			c.gridy = 3;
+			frame.getContentPane().add(btnMainLabel, c);
+			
+			
 
 			frame.pack();
 			frame.setVisible(true);
+			
+			frame.setSize(500, 450);
+			//peter
+			//ButtonLayOut btn = new ButtonLayOut();
+			//btn.initbtnMainLabel(btnMainLabel);
+			
+			ButtonLayOut btnLayOut = new ButtonLayOut();
+			btnMainLabel.setPreferredSize(new Dimension(300, 60));
+			btnReplay = btnLayOut.initButton(btnMainLabel,150,60,"replay.png");
+			btnStart = btnLayOut.initButton(btnMainLabel,200,60,"start.png");
+			btnStop = btnLayOut.initButton(btnMainLabel,150,60,"stop.png");
+			
+			btnMainLabel.setBorder(new LineBorder(Color.green, 0));
+		    btnMainLabel.setLayout(new BorderLayout());
+		   
+		    btnMainLabel.add(btnReplay, BorderLayout.WEST);
+		    btnMainLabel.add(btnStart, BorderLayout.CENTER);
+		    btnMainLabel.add(btnStop, BorderLayout.EAST);
+		    setBtnListener();
+		   // btnReplay.
+			
+			//peter
+			
+//			btn.initButton_pause(button_pause);
+//			btn.initButton_stop(button_stop);
 			
 //			java.util.List<BufferedImage> frames = allFrames(args[0]);
 //				for(int i = 0; i!= frames.size(); i++){
@@ -117,18 +168,6 @@ public class AVPlayer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
-
-		
-			
-			
-			
-
-
-
-		
-		
-		
-		
 	}
 	
 	public void updateFrame(){
@@ -150,6 +189,7 @@ public class AVPlayer {
 //				System.out.println(img);
 			}
 			lbIm1.setIcon(new ImageIcon(img));
+			
 //			System.out.println(i);
 			Thread.sleep(intervalTime);
 		}}
@@ -243,6 +283,12 @@ public class AVPlayer {
 			
 	}
 	
+	//peter
+	
+	PlaySound playSound;
+	
+	//peter
+	
 	public void playWAV(String filename){
 		// opens the inputStream
 		FileInputStream inputStream;
@@ -254,8 +300,7 @@ public class AVPlayer {
 		}
 
 		// initializes the playSound Object
-		PlaySound playSound = new PlaySound(inputStream);
-
+		playSound = new PlaySound(inputStream);
 		// plays the sound
 		try {
 			playSound.play();
@@ -264,14 +309,36 @@ public class AVPlayer {
 			return;
 		}
 	}
+	
+	public void setBtnListener(){
+		btnStart.addActionListener(new ActionListener() {
+			boolean is_pause = false;
+	           @Override
+	           public void actionPerformed(ActionEvent e) {
+	        	   
+	        	   // start button was clicked 
+	        	   if(!is_pause){
+	        		   btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon("pause.png"), 60, 60));
+	        		   playSound.Stop();
+	        		   is_pause = true;
+	        	   }else{
+	        		   btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon("start.png"), 60, 60));
+	        		   playSound.Resume();
+	        		   is_pause = false;
+	        	   }
+	        	
+	        	 
+	        	  }
+	       });
+	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		if (args.length < 2) {
 		    System.err.println("usage: java -jar AVPlayer.jar [RGB file] [WAV file]");
 		    return;
 		}
 		
-		AVPlayer ren = new AVPlayer();
+		final AVPlayer ren = new AVPlayer();
 		ren.initialize(args);
 		Thread imgs = new Thread() {
 			public void run(){
@@ -288,6 +355,7 @@ public class AVPlayer {
 		read.start();
 		imgs.start();
 		ren.playWAV(args[1]);
+		
 	}
 
 }

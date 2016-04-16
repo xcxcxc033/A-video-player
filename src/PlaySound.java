@@ -7,6 +7,7 @@ import java.io.InputStream;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -82,8 +83,12 @@ public class PlaySound {
 	    throw new PlayWaveException(e1);
 	} finally {
 	    // plays what's left and and closes the audioChannel
+		
+		//peter
 	    dataLine.drain();
 	    dataLine.close();
+		//peter
+	
 	}
 
     }
@@ -91,13 +96,13 @@ public class PlaySound {
 	//peter
 		public void Stop(){
 			dataLine.stop();
+			System.out.println("stop");
 		}
 		
-		public void Restart(){
+		public void Resume(){
 			dataLine.start();
+			System.out.println("resume");
 		}
 		//peter
-	
-	
 	
 }
