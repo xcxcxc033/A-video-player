@@ -131,7 +131,7 @@ public class AVPlayer {
 				BufferedImage img = playImage.getCurrentImg();
 				while (img == null) {
 					img = playImage.getCurrentImg();
-					Thread.sleep(1);
+					Thread.sleep(10);
 					// System.out.println(img);
 				}
 				lbIm1.setIcon(new ImageIcon(img));
@@ -190,13 +190,13 @@ public class AVPlayer {
 					AVPlayer.this.playImage.startOrContinue();
 					btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon(
 							"pause.png"), 60, 60));
-					playSound.Stop();
+					playSound.startOrResume();
 					is_pause = true;
 				} else {
 					AVPlayer.this.playImage.pause();
 					btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon(
 							"start.png"), 60, 60));
-					playSound.Resume();
+					playSound.Stop();
 					is_pause = false;
 				}
 
