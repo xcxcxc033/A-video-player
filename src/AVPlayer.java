@@ -94,11 +94,9 @@ public class AVPlayer {
 			JLabel lbText2 = new JLabel("Audio: " + args[1]);
 			lbText2.setHorizontalAlignment(SwingConstants.LEFT);
 			lbIm1 = new JLabel(new ImageIcon(img));
-<<<<<<< HEAD
+
 			JLabel btnMainLabel = new JLabel();
-=======
-			JLabel button_start = new JLabel();
->>>>>>> origin/master
+
 			JLabel last = new JLabel("last");
 //			JLabel button_stop = new JLabel("btn_stop");
 
