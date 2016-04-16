@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimerTask;
 
 
 public class AVPlayer {
@@ -144,29 +146,39 @@ public class AVPlayer {
 		} 
 	}
 	
-	public void updateFrame(){
-		System.out.print(100000000);
+	public void updateFrame(Thread t){
+//		System.out.print(100000000);
+		System.out.printf("%d, ", current);
+		System.out.println(new Date());
+		
 		try{
-		for(int i = 0; i!= bufferedImgs.length; i++){
-			System.gc();
-			synchronized (currentLock) {
-				current = i;
+//		for(int i = 0; i!= bufferedImgs.length; i++){
+			if(current > bufferedImgs.length){
+				return;
 			}
+			System.gc();
 			
-			BufferedImage img = bufferedImgs[i];
+			BufferedImage img = bufferedImgs[current];
 			while(img == null){
-                synchronized(locks[i]){
-                    img = bufferedImgs[i];
+                synchronized(locks[current]){
+                    img = bufferedImgs[current];
                 }
-                bufferedImgs[i] = null;
+                bufferedImgs[current] = null;
                 Thread.sleep(1);
 //				System.out.println(img);
 			}
 			lbIm1.setIcon(new ImageIcon(img));
 			
+			img = null;
 //			System.out.println(i);
-			Thread.sleep(intervalTime);
-		}}
+//			Thread.sleep(intervalTime);
+//			synchronized (currentLock) {
+//				current++;
+//			}
+			
+
+		}
+		
 		catch(InterruptedException e){
 			
 		}
@@ -289,10 +301,22 @@ public class AVPlayer {
 		ren.initialize(args);
 		Thread imgs = new Thread() {
 			public void run(){
-				ren.updateFrame();
+				while(true){
+					ren.updateFrame(this);
+					try {
+						synchronized (this) {
+							wait();
+						}
+						
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
 			}
 		};
-		
+//		
 		
 		Thread read = new Thread(){
 			public void run(){
@@ -301,6 +325,24 @@ public class AVPlayer {
 		};
 		read.start();
 		imgs.start();
+		java.util.Timer updateFrameTimer = new java.util.Timer();
+		TimerTask updateFrameTimerTask = new TimerTask(){
+			public void run(){
+				synchronized (ren.currentLock) {
+					ren.current++;
+					
+				}
+				synchronized (imgs) {
+					imgs.notify();
+				}
+				
+//				ren.updateFrame(this);
+			}
+		};
+		
+		updateFrameTimer.scheduleAtFixedRate(updateFrameTimerTask,0, ren.intervalTime);
+		
+//		imgs.start();
 		ren.playWAV(args[1]);
 	}
 
