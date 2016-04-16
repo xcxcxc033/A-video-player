@@ -30,6 +30,8 @@ public class AVPlayer {
     private int loadedFrame = -1;
     private Object currentLock = new Object();
     private final int intervalTime = 66;//66;
+    private TimerTask updateFrameTimerTask;
+    private Thread imgs;
     
     //peter 
     JButton btnReplay;
@@ -304,6 +306,89 @@ public class AVPlayer {
 			
 	}
 	
+	public void start(){
+		AVPlayer.this.current = 0;
+		
+		if (imgs == null) {
+			imgs = new Thread() {
+				public void run() {
+					while (true) {
+						AVPlayer.this.updateFrame(this);
+						try {
+							synchronized (this) {
+								wait();
+							}
+
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+
+				}
+			};
+			imgs.start();
+		}
+		
+		if(updateFrameTimerTask != null){
+			updateFrameTimerTask.cancel();
+		}
+		java.util.Timer updateFrameTimer = new java.util.Timer();
+		updateFrameTimerTask = new TimerTask(){
+			public void run(){
+				
+				synchronized (AVPlayer.this.currentLock) {
+					AVPlayer.this.current++;
+					
+				}
+				synchronized (imgs) {
+					imgs.notify();
+				}
+				
+//				ren.updateFrame(this);
+			}
+		};
+		
+		updateFrameTimer.scheduleAtFixedRate(updateFrameTimerTask, 0, AVPlayer.this.intervalTime);
+		
+		
+		
+	}
+	
+	public void pause(){
+		if(updateFrameTimerTask != null){
+			updateFrameTimerTask.cancel();
+		}
+	}
+	
+	public void startOrContinue(){
+		if(imgs == null){
+			this.start();
+		}
+		else{
+			this.avContinue();
+		}
+	}
+	
+	public void avContinue(){
+		java.util.Timer updateFrameTimer = new java.util.Timer();
+		updateFrameTimerTask = new TimerTask(){
+			public void run(){
+				
+				synchronized (AVPlayer.this.currentLock) {
+					AVPlayer.this.current++;
+					
+				}
+				synchronized (imgs) {
+					imgs.notify();
+				}
+				
+//				ren.updateFrame(this);
+			}
+		};
+		updateFrameTimer.scheduleAtFixedRate(updateFrameTimerTask, 0, AVPlayer.this.intervalTime);
+	}
+	
 	//peter
 	
 	PlaySound playSound;
@@ -339,10 +424,12 @@ public class AVPlayer {
 	        	   
 	        	   // start button was clicked 
 	        	   if(!is_pause){
+	        		   AVPlayer.this.startOrContinue();
 	        		   btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon("pause.png"), 60, 60));
 	        		   playSound.Stop();
 	        		   is_pause = true;
 	        	   }else{
+	        		   AVPlayer.this.pause();
 	        		   btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon("start.png"), 60, 60));
 	        		   playSound.Resume();
 	        		   is_pause = false;
@@ -361,23 +448,7 @@ public class AVPlayer {
 		
 		final AVPlayer ren = new AVPlayer();
 		ren.initialize(args);
-		Thread imgs = new Thread() {
-			public void run(){
-				while(true){
-					ren.updateFrame(this);
-					try {
-						synchronized (this) {
-							wait();
-						}
-						
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-			}
-		};
+		
 //		
 		
 		Thread read = new Thread(){
@@ -386,25 +457,7 @@ public class AVPlayer {
 			}
 		};
 		read.start();
-		imgs.start();
-		java.util.Timer updateFrameTimer = new java.util.Timer();
-		TimerTask updateFrameTimerTask = new TimerTask(){
-			public void run(){
-				synchronized (ren.currentLock) {
-					ren.current++;
-					
-				}
-				synchronized (imgs) {
-					imgs.notify();
-				}
-				
-//				ren.updateFrame(this);
-			}
-		};
 		
-		updateFrameTimer.scheduleAtFixedRate(updateFrameTimerTask,0, ren.intervalTime);
-		
-//		imgs.start();
 		ren.playWAV(args[1]);
 		
 	}
