@@ -21,7 +21,7 @@ public class PlayImage {
 	private int last = -1;
 	private String filename;
 
-	public PlayImage(String filename) {
+	public PlayImage(final String filename) {
 		this.filename = filename;
 		File file = new File(filename);
 		InputStream is;
