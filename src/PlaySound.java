@@ -42,13 +42,7 @@ public class PlaySound {
     //Peter
     
     SourceDataLine dataLine = null;
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
-
-    
-    byte[] bytes = out.toByteArray();
-    
-    
+    Clip clip = null;
     //Peter
     
    // Clip clip = AudioSystem.getClip(); //cx
@@ -58,10 +52,14 @@ public class PlaySound {
 	AudioInputStream audioInputStream = null;
 	try {
 	    audioInputStream = AudioSystem.getAudioInputStream(this.waveStream);
+	    clip = AudioSystem.getClip();
 	} catch (UnsupportedAudioFileException e1) {
 	    throw new PlayWaveException(e1);
 	} catch (IOException e1) {
 	    throw new PlayWaveException(e1);
+	} catch (LineUnavailableException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
 	}
 
 	// Obtain the information about the AudioInputStream
@@ -71,16 +69,22 @@ public class PlaySound {
 	// opens the audio channel
 	//SourceDataLine dataLine = null; //Peter Delete
 	try {
+		clip.open(audioInputStream);
 	    dataLine = (SourceDataLine) AudioSystem.getLine(info);
 	    dataLine.open(audioFormat, this.EXTERNAL_BUFFER_SIZE);
 	} catch (LineUnavailableException e1) {
 	    throw new PlayWaveException(e1);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
 	}
 	
 
 	// Starts the music :P
-	dataLine.start();
-	
+//	clip.start();
+//	dataLine.start();
+
+	int readBytes = 0;
 	byte[] audioBuffer = new byte[this.EXTERNAL_BUFFER_SIZE];
 //	int framesize = audioBuffer.length;
 //	byte[] packet = new byte[framesize];
@@ -134,17 +138,31 @@ public class PlaySound {
 
     }
 	
+	public void startOrResume(){
+		if(clip == null){
+			try {
+				this.play();
+			} catch (PlayWaveException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else{
+			this.Resume();
+		}
+	}
 	//peter
 		public void Stop(){
-			dataLine.stop();
-			readBytes = 0;
-			System.out.println("stop" + readBytes);
+//			dataLine.stop();
+			clip.stop();
+			System.out.println("stop");
 		}
 		
 		public void Resume(){
-			dataLine.start();
-			readBytes = 0;
-			System.out.println("resume" + readBytes);
+			clip.start();
+			
+//			dataLine.start();
+			System.out.println("resume");
 		}
 		//peter
 	
