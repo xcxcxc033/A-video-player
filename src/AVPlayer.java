@@ -232,7 +232,7 @@ public class AVPlayer {
 				playSound.Stop();
 				
 				btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon(
-						"/Users/ChenXi/icons/start.png"), 60, 60));
+						"/Users/ChenXi/icons/pause.png"), 60, 60));
 				is_pause = true;
 				AVPlayer.this.playWAV(soundFilename);
 				playSound.startOrResume();
