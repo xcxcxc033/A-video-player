@@ -21,7 +21,7 @@ public class AVPlayer {
 	BufferedImage img;
 	BufferedImage[] bufferedImgs;
 	PlayImage playImage;
-
+	private String soundFilename;
 	// peter
 	JButton btnReplay;
 	JButton btnStart;
@@ -37,6 +37,8 @@ public class AVPlayer {
 
 		img = playImage.getFirstImage();
 		// Use labels to display the images
+		
+		soundFilename = args[1];
 
 		frame = new JFrame();
 		GridBagLayout gLayout = new GridBagLayout();
@@ -91,9 +93,9 @@ public class AVPlayer {
 
 		ButtonLayOut btnLayOut = new ButtonLayOut();
 		btnMainLabel.setPreferredSize(new Dimension(300, 60));
-		btnReplay = btnLayOut.initButton(btnMainLabel, 150, 60, "replay.png");
-		btnStart = btnLayOut.initButton(btnMainLabel, 200, 60, "start.png");
-		btnStop = btnLayOut.initButton(btnMainLabel, 150, 60, "stop.png");
+		btnReplay = btnLayOut.initButton(btnMainLabel, 150, 60, "/Users/ChenXi/icons/replay.png");
+		btnStart = btnLayOut.initButton(btnMainLabel, 200, 60, "/Users/ChenXi/icons/start.png");
+		btnStop = btnLayOut.initButton(btnMainLabel, 150, 60, "/Users/ChenXi/icons/stop.png");
 
 		btnMainLabel.setBorder(new LineBorder(Color.green, 0));
 		btnMainLabel.setLayout(new BorderLayout());
@@ -177,10 +179,10 @@ public class AVPlayer {
 			return;
 		}
 	}
-
+	boolean is_pause = false;
 	public void setBtnListener() {
 		btnStart.addActionListener(new ActionListener() {
-			boolean is_pause = false;
+			
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -189,19 +191,57 @@ public class AVPlayer {
 				if (!is_pause) {
 					AVPlayer.this.playImage.startOrContinue();
 					btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon(
-							"pause.png"), 60, 60));
+							"/Users/ChenXi/icons/pause.png"), 60, 60));
 					playSound.startOrResume();
 					is_pause = true;
 				} else {
 					AVPlayer.this.playImage.pause();
 					btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon(
-							"start.png"), 60, 60));
+							"/Users/ChenXi/icons/start.png"), 60, 60));
 					playSound.Stop();
 					is_pause = false;
 				}
+				
+				
 
 			}
 		});
+		
+		btnStop.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				playSound.Stop();
+			
+				btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon(
+						"/Users/ChenXi/icons/start.png"), 60, 60));
+				is_pause = false;
+				AVPlayer.this.playWAV(soundFilename);
+				AVPlayer.this.playImage.stop();
+
+				
+			}
+			// stop btn clicked
+			
+		});
+		
+		btnReplay.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				playSound.Stop();
+				
+				btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon(
+						"/Users/ChenXi/icons/start.png"), 60, 60));
+				is_pause = false;
+				AVPlayer.this.playWAV(soundFilename);
+				playSound.startOrResume();
+				AVPlayer.this.playImage.stop();
+				AVPlayer.this.playImage.startOrContinue();
+			}
+			
+		});
+		
 	}
 
 	public static void main(final String[] args) {
