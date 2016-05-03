@@ -233,11 +233,11 @@ public class AVPlayer {
 				
 				btnStart.setIcon(ButtonLayOut.ChangeImgSize(new ImageIcon(
 						"/Users/ChenXi/icons/start.png"), 60, 60));
-				is_pause = false;
+				is_pause = true;
 				AVPlayer.this.playWAV(soundFilename);
 				playSound.startOrResume();
 				AVPlayer.this.playImage.stop();
-				AVPlayer.this.playImage.startOrContinue();
+				AVPlayer.this.playImage.start();
 			}
 			
 		});
