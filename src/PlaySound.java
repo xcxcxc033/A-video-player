@@ -3,8 +3,11 @@
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -26,15 +29,16 @@ public class PlaySound {
 
     private InputStream waveStream;
     int readBytes = 0;
+    
 
     private final int EXTERNAL_BUFFER_SIZE = 524288; // 128Kb
-
+    byte[] buffer = null;
     /**
      * CONSTRUCTOR
      */
-    public PlaySound(InputStream waveStream) {
-	//this.waveStream = waveStream;
-	this.waveStream = new BufferedInputStream(waveStream);
+    public PlaySound(byte[] waveStream) {
+	//this.waveStream = new BufferedInputStream(waveStream);
+    	this.buffer = waveStream;
     }
 
    // byte[] bytes = IOUtils.toByteArray(waveStream);
@@ -45,13 +49,18 @@ public class PlaySound {
     Clip clip = null;
     //Peter
     
-   // Clip clip = AudioSystem.getClip(); //cx
     
-	public void play() throws PlayWaveException {
+	public void play() throws PlayWaveException, IOException {
 
 	AudioInputStream audioInputStream = null;
+	AudioInputStream wav_file_format = null;
+	File audio = null;
 	try {
-	    audioInputStream = AudioSystem.getAudioInputStream(this.waveStream);
+	    //audioInputStream = AudioSystem.getAudioInputStream(this.waveStream);
+		audio = new File("Alin_Day1_002.wav"); 
+	    wav_file_format = AudioSystem.getAudioInputStream(audio);
+	    //AudioSystem.getAudio
+	    
 	    clip = AudioSystem.getClip();
 	} catch (UnsupportedAudioFileException e1) {
 	    throw new PlayWaveException(e1);
@@ -63,78 +72,29 @@ public class PlaySound {
 	}
 
 	// Obtain the information about the AudioInputStream
-	AudioFormat audioFormat = audioInputStream.getFormat();
-	Info info = new Info(SourceDataLine.class, audioFormat);
+	
+	//AudioFormat audioFormat = audioInputStream.getFormat();
+	//Info info = new Info(SourceDataLine.class, audioFormat);
 
 	// opens the audio channel
 	//SourceDataLine dataLine = null; //Peter Delete
+	
+//	for(int i = 0; i < buffer.length/10; i++){
+//		System.out.println(buffer[i] + "  " + i);
+//	}
+	System.out.println(audio.length());
+	System.out.println(Integer.MAX_VALUE);
+	
+	
 	try {
-		clip.open(audioInputStream);
-	    dataLine = (SourceDataLine) AudioSystem.getLine(info);
-	    dataLine.open(audioFormat, this.EXTERNAL_BUFFER_SIZE);
+		clip.open(wav_file_format.getFormat(), buffer ,0,(int) audio.length());
+//	    dataLine = (SourceDataLine) AudioSystem.getLine(info);
+//	    dataLine.open(audioFormat, this.EXTERNAL_BUFFER_SIZE);
 	} catch (LineUnavailableException e1) {
 	    throw new PlayWaveException(e1);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
 	}
 	
 
-	// Starts the music :P
-//	clip.start();
-//	dataLine.start();
-
-	int readBytes = 0;
-	byte[] audioBuffer = new byte[this.EXTERNAL_BUFFER_SIZE];
-//	int framesize = audioBuffer.length;
-//	byte[] packet = new byte[framesize];
-	try {
-		readBytes = audioInputStream.read(audioBuffer, 0, audioBuffer.length);
-		//int numBytesRead = audioInputStream.read(packet, 0, framesize);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	System.out.println(this.EXTERNAL_BUFFER_SIZE/15/60/5);
-	
-	for(int i = 0; i < readBytes; i++){
-		audioBuffer[i] = (byte)(-1 * audioBuffer[i]);
-		System.out.println(audioBuffer[i]);
-	}
-		
-
-	
-	
-	
-	
-
-//	try {
-////	    while (readBytes != -1) {
-////		readBytes = audioInputStream.read(audioBuffer, 0,
-////			audioBuffer.length);
-////		if (readBytes >= 0){
-////		    dataLine.write(audioBuffer, 0, readBytes);
-////		}
-////	    }
-//	} catch (IOException e1) {
-//	    throw new PlayWaveException(e1);
-//	} finally {
-//	    // plays what's left and and closes the audioChannel
-//		//peter
-//	    dataLine.drain();
-//	    dataLine.close();
-//		//peter
-//	}
-	
-	
-	
-	
-	
-
-	
-//	for(int i = 0; i < audioBuffer.length; i++){
-//		System.out.println(audioBuffer[i]);
-//	}
 
     }
 	
@@ -142,7 +102,7 @@ public class PlaySound {
 		if(clip == null){
 			try {
 				this.play();
-			} catch (PlayWaveException e) {
+			} catch (PlayWaveException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -165,5 +125,7 @@ public class PlaySound {
 			System.out.println("resume");
 		}
 		//peter
+		
+		
 	
 }
