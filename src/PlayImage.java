@@ -241,6 +241,13 @@ public class PlayImage {
 			updateFrameTimerTask.cancel();
 		}
 	}
+	
+	public void stop(){
+		if (updateFrameTimerTask != null) {
+			updateFrameTimerTask.cancel();
+		}
+		this.current = 0;
+	}
 
 	public void startOrContinue() {
 		if (updateFrameTimerTask == null) {
